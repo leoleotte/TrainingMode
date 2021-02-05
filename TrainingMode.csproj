@@ -62,7 +62,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy.exe /Y  "$(TargetPath)" "D:\Leotte\Games\Hollow Knight\Hollow Knight Godmaster\hollow_knight_Data\Managed\Mods\"
-"D:\Leotte\Games\Hollow Knight\Hollow Knight Godmaster\hollow_knight.exe"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
