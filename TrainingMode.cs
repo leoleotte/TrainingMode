@@ -12,7 +12,7 @@ namespace TrainingMode
 		#region Initialization
 		public override string GetVersion()
 		{
-			return string.Format("0.0.0.1 - {0}", System.DateTime.Now.ToShortTimeString());
+			return "0.0.0.1";
 		}
 
 		public override void Initialize()

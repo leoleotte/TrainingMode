@@ -26,6 +26,15 @@ namespace TrainingMode
 		void Start()
 		{
 			Modding.Logger.Log("NEW BEHAVIOUR ACHIEVED");
+
+			On.HeroController.CanSuperDash += OnCanSuperDash;
+			//On.HeroController.SuperDash += OnSuperDash;
+		}
+
+		private void OnSuperDash(On.HeroController.orig_SuperDash orig, HeroController self)
+		{
+			orig(self);
+			Modding.Logger.Log("SuperDash");
 		}
 
 		void FixedUpdate()
@@ -47,6 +56,7 @@ namespace TrainingMode
 			Modding.Logger.Log(string.Format("Canvas active: {0}", _trainingCanvas.gameObject.activeInHierarchy));
 
 			_trainingCanvas.SetActive(true);
+			Destroy(_trainingCanvas.GetComponent<GraphicRaycaster>());
 
 			if (_titleLabel?.gameObject == null)
 				_titleLabel = CanvasUtil.CreateTextPanel(_trainingCanvas.gameObject, "TrainingMode - Runtime", 12, TextAnchor.UpperRight,
@@ -54,6 +64,25 @@ namespace TrainingMode
 					.GetComponentInChildren<Text>();
 
 			_titleLabel.gameObject.SetActive(true);
+		}
+
+		private void DebugSceneGameObjects(UnityEngine.SceneManagement.Scene scene)
+		{
+			var rootGameObjects = scene.GetRootGameObjects();
+			RecursiveLogName(GameObject.Find("PlayMaker"));
+			foreach (var obj in rootGameObjects)
+			{
+				RecursiveLogName(obj);
+			}
+
+			void RecursiveLogName(GameObject obj)
+			{
+				Modding.Logger.Log(obj.name);
+				string children = string.Empty;
+				for (int i = 0; i < obj.transform.childCount; i++)
+					children += obj.transform.GetChild(i) + ", ";
+				Modding.Logger.Log(string.Format("{0}: {1}", obj.name, children));
+			}
 		}
 
 		private IEnumerator WaitForSceneChangedFrame(Action onFrameWait)
@@ -67,14 +96,15 @@ namespace TrainingMode
 		#region Event Methods
 		public void OnHeroUpdated()
 		{
-			var heroState = HeroController.instance.CanSuperDash();
-			if (_titleLabel != null)
-				_titleLabel.text = string.Format("CanSuperDash: {0}", heroState);
+			//var heroState = HeroController.instance.CanSuperDash();
+			//if (_titleLabel != null)
+			//	_titleLabel.text = string.Format("CanSuperDash: {0}", heroState);
 			//Modding.Logger.Log(string.Format("Hero state: {0}", heroState));
 		}
 
 		public void OnSceneChanged(UnityEngine.SceneManagement.Scene oldScene, UnityEngine.SceneManagement.Scene newScene)
 		{
+			Modding.Logger.Log(string.Format("Scene loaded: {0}", newScene.name));
 			//shitty callback for thread
 			StartCoroutine(WaitForSceneChangedFrame(OnFrameWait));
 
@@ -82,6 +112,14 @@ namespace TrainingMode
 			{
 				InitializeUI();
 			}
+		}
+
+		private bool OnCanSuperDash(On.HeroController.orig_CanSuperDash orig, HeroController self)
+		{
+			bool originalValue = orig(self);
+			Modding.Logger.Log(string.Format("CanSuperDash: {0}", originalValue));
+			_titleLabel.text = string.Format("CanSuperDash: {0}", originalValue);
+			return originalValue;
 		}
 		#endregion
 	}
